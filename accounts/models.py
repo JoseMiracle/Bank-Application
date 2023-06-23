@@ -1,18 +1,16 @@
 # Create your models here.
 from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager,
-    AbstractBaseUser,
-    AbstractUser
-)
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, AbstractUser
+from banks.models import Banks
 from django.utils.translation import gettext_lazy as _
-import uuid
+
 
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
     for authentication instead of usernames.
     """
+
     def create_user(self, email, password, **extra_fields):
         """
         Create and save a user with the given email and password.
@@ -37,22 +35,31 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
-        return self.create_user(email, password, **extra_fields)        
+        return self.create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractUser):
+class Client(AbstractUser):
+    ACCOUNT_TYPE = (
+        ("savings", "savings"),
+        ("current", "current"),
+        ("student", "student"),
+    )
     username = None
-    email = models.EmailField(_("email address"), unique=True)
+    bank = models.ForeignKey(Banks, on_delete=models.CASCADE)
+    email = models.EmailField(_("email address"), blank=False, null=False, unique=True)
     other_name = models.CharField(max_length=70, blank=True)
-    is_verified = models.BooleanField(default=False)
     image = models.ImageField(upload_to="images/")
-  
+    account_number = models.CharField(max_length=10)
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPE)
+    gender = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    home_address = models.CharField(max_length=250)
+    account_balance = models.IntegerField(default=0)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email   
-
-
+        return self.email
