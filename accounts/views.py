@@ -68,10 +68,12 @@ class AccountBalanceAPIView(generics.RetrieveAPIView):
 class DeleteAccountAPIView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ["delete"]
-    lookup_field = "pk"
+    
+    def get_object(self):
+        return self.request.user
+    
 
-    def get_queryset(self):
-        return Client.objects.all()
-
-    def perform_destroy(self, instance):
-        return super().perform_destroy(instance)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

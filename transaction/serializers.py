@@ -35,7 +35,7 @@ class TransactionSerializer(serializers.ModelSerializer):
                 sender.account_number == validated_data["receiver"]
             ):  # This checks if the money is deposited to sender account number
                 sender.account_balance += validated_data["amount"]
-                print("****", sender.account_balance)
+                sender.save()
             else:
                 receiver.account_balance += validated_data[
                     "amount"
@@ -77,3 +77,10 @@ class TransactionDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ["amount", "bank", "receiver", "transaction_type", "date"]
+
+    def to_representation(self, instance):
+        
+        data  = super().to_representation(instance)
+        receiver_name = Client.objects.get(account_number = instance.receiver).get_full_name()
+        data["receiver_name"] = receiver_name
+        return data
