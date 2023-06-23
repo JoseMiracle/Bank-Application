@@ -2,9 +2,9 @@ from django.urls import path
 from transaction.views import TransactionAPIView, TransactionDetailsAPIView
 
 urlpatterns = [
-    path("all-transactions/", TransactionAPIView.as_view(), name="send-money"),
+    path("any-transaction/", TransactionAPIView.as_view(), name="all-transactions"),
     path(
-        "transaction-details/",
+        "all-transaction-details/",
         TransactionDetailsAPIView.as_view(),
         name="transaction-details",
     ),
