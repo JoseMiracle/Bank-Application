@@ -36,10 +36,10 @@ class TransactionSerializer(serializers.ModelSerializer):
             ):  # This checks if the money is deposited to sender account number
                 sender.account_balance += validated_data["amount"]
                 sender.save()
-            else:
+            else:# This checks if the money is deposited into another account number
                 receiver.account_balance += validated_data[
                     "amount"
-                ]  # This checks if the money is deposited into another account number
+                ]  
                 receiver.save()
             Transaction.objects.create(
                 amount=validated_data["amount"],
